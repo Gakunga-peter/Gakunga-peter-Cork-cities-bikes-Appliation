@@ -1,0 +1,187 @@
+var mapjs = {
+    map: false,
+    launchmap: function () {
+        mapjs.map = new google.maps.Map(document.getElementById('bike-map'), {
+            zoom: 7,
+            center: new google.maps.LatLng(53.2434317, -7.358035),
+            scrollwheel: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            mapTypeControlOptions: {
+                style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                position: google.maps.ControlPosition.LEFT_BOTTOM
+            },
+            panControl: false,
+            zoomControl: true,
+            zoomControlOptions: {
+                style: google.maps.ZoomControlStyle.LARGE,
+                position: google.maps.ControlPosition.LEFT_CENTER
+            },
+            scaleControl: true, // fixed to BOTTOM_RIGHT
+            streetViewControl: true,
+            streetViewControlOptions: {
+                position: google.maps.ControlPosition.LEFT_CENTRE
+            }
+        });
+    },
+    locations:
+        function() {
+            //Found in the footer of the page
+            return mapsfromcache;
+        },
+    centres: {
+        'cork': [51.897115, -8.476962],
+        'limerick': [52.6653179, -8.6272217],
+        'galway': [53.2768655, -9.0344912],
+        'waterford': [52.258831, -7.108468]
+    },
+    pins: {
+        'cork': 'red',
+        'limerick': 'green',
+        'galway': 'purple',
+        'waterford': 'amber',
+        'grey': 'grey'
+    },
+    open: function (centre) {
+        if (!centre) {
+            //Close Map
+            $('#homeformswitch').hide();
+            $(".home #bike-map").addClass("map-active");
+
+            $(".map-holder .hidden-xs, #home-banner").css({'display': 'block'}).animate({opacity: 1}, 500);
+            $("#bike-map").animate({opacity: 0}, 500);
+            mapjs.removeCookie(null);
+
+            return false;
+        } else {
+            $(".map-holder .hidden-xs, #home-banner").hide();
+            $("#bike-map").animate({opacity: 1}, 500);
+
+        }
+
+        if (!mapjs.map) {
+            mapjs.launchmap();
+        }
+
+        mapjs.setCookie(centre);
+
+        $('#homeformswitch').show();
+        $('#homemap-change').val(centre);
+
+        var pinpoins = this.locations()[centre];
+
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+        markers = [];
+
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < pinpoins.length; i++) {
+            var loc = pinpoins;
+            bounds.extend(new google.maps.LatLng(loc[i].latitude, loc[i].longitude));
+        }
+        mapjs.map.fitBounds(bounds);
+        setTimeout(function () {
+            var i = 0;
+            mapjs.interval = setInterval(function () {
+                
+                var loc = pinpoins;
+                
+                if(loc[i].status == '0') {
+                    var pinimg = mapjs.pins.limerick;
+                } else {
+                    var pinimg = mapjs.pins.grey;
+                }
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(loc[i].latitude, loc[i].longitude),
+                    map: mapjs.map,
+                    draggable: false,
+                    animation: google.maps.Animation.DROP,
+                    optimized: false,
+                    title: loc[i].name + ' Bikes: ' + loc[i].bikesAvailable + ' Stands: ' + loc[i].docksAvailable,
+                    icon: 'assets/images/pins/pin_' + pinimg + '.png'
+                });
+                var contentString = '<div class="mapinfo-content">' +
+                        '<h3 id="firstHeading" class="firstHeading">' + loc[i].name + ' <small>' + loc[i].nameIrish + '</small></h3>' +
+                        '<div class="map-bodyContent">' +
+                        'Bikes: ' + loc[i].bikesAvailable + '<br />' +
+                        'Stands: ' + loc[i].docksAvailable + '<br />' +
+                        '<a href="' + centre + '.html">Find out More</a><br />' +
+                        '<a href="https://maps.google.com/?saddr=Current+Location&daddr=' + loc[i].latitude + ',' + loc[i].longitude + '&dirflg=b" target="_blank">Directions to Here</a><br />' +
+                        '<span class="coordinates">' + loc[i].latitude + ',' + loc[i].longitude + '</span>' +
+                        '</div>' +
+                        '<div class="clearfix"></div>' +
+                        '</div>';
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: contentString,
+                    boxStyle: {
+                        width: "200px"
+                    },
+                    disableAutoPan: true
+                });
+
+                markers.push(marker);
+                google.maps.event.addListener(marker, 'click', function () {
+                    var holdMarker = $(".home #bike-map").hasClass("map-active");
+                    $(".home #bike-map").addClass("map-active");
+                    var openTimeout = 60;
+                    setTimeout(function () {
+                        if (!holdMarker) {
+                            //google.maps.event.trigger(mapjs.map, "resize");
+                            //mapjs.map.setZoom(mapjs.map.getZoom()+1);
+                        }
+
+                        if (openInfoWindow) {
+                            openInfoWindow.close();
+                        }
+                        openInfoWindow = infowindow;
+                        infowindow.open(mapjs.map, marker);
+                        var offsets = {
+                            'cork': 0.004,
+                            'galway': 0.0039,
+                            'limerick': 0.008,
+                            'waterford': 0.008
+                        };
+                        mapjs.map.panTo((new google.maps.LatLng(marker.position.lat() + offsets[mapjs.cookieSet()], marker.position.lng())));
+
+                    }, openTimeout);
+
+                });
+
+                i++;
+                if (i >= pinpoins.length) {
+
+                    clearInterval(mapjs.interval);
+                    return;
+                }
+            }, 100);
+        }, 200);
+    },
+    interval: false,
+    setCookie: function (val) {
+        var d = new Date();
+        d.setTime(d.getTime() + (12 * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = "selectedcity=" + val + "; " + expires;
+        cookieNotice.start();
+    },
+    removeCookie: function (val) {
+        document.cookie = "selectedcity=null" +
+                ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
+    },
+    cookieSet: function () {
+        var name = "selectedcity=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ')
+                c = c.substring(1);
+            if (c.indexOf(name) != -1)
+                return c.substring(name.length, c.length);
+        }
+        return "";
+    }
+};
+var markers = [];
+var openInfoWindow = false;
+
