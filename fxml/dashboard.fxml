@@ -1,15 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.corkcitiesbikes.controllers.DashboardController">
+            fx:controller="com.example.corkcitiesbikes.controllers.DashboardController"
+            style="-fx-font-family: 'Arial'; -fx-background-color: #f5f5f5;">
 
+    <!-- Header Section -->
+    <top>
+        <HBox spacing="15" style="-fx-padding: 10; -fx-background-color: #2d572c;">
+            <ImageView fitHeight="40" fitWidth="40" style="-fx-cursor: hand;">
+                <image>
+                    <Image url="@/media/images/logo.png" />
+                </image>
+            </ImageView>
+            <Button text="About Us" onAction="#navigateToAboutUs" style="-fx-background-color: white; -fx-text-fill: #2d572c;" />
+            <Button text="Contact" onAction="#navigateToContact" style="-fx-background-color: white; -fx-text-fill: #2d572c;" />
+            <Button text="Pricing" onAction="#navigateToPricing" style="-fx-background-color: white; -fx-text-fill: #2d572c;" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <TextField fx:id="searchField" promptText="Search..." style="-fx-pref-width: 300px;" />
+            <Button text="Search" onAction="#handleSearch"
+                    style="-fx-background-color: white; -fx-text-fill: #2d572c;" />
+            <ImageView fx:id="profilePicture" fitHeight="40" fitWidth="40" style="-fx-cursor: hand;">
+                <image>
+                    <Image url="@/media/images/default_profile.png" />
+                </image>
+            </ImageView>
+            <Button text="Logout" onAction="#logout"
+                    style="-fx-background-color: white; -fx-text-fill: #2d572c;" />
+        </HBox>
+    </top>
+
+    <!-- Main Content -->
     <center>
-        <VBox alignment="CENTER" spacing="20">
-            <Label fx:id="userNameText" text="Welcome, User!" />
-        </VBox>
+        <ScrollPane style="-fx-padding: 10;">
+            <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20;">
+                <Label text="Bikeshare Cities" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+                <VBox alignment="CENTER" spacing="15" style="-fx-padding: 10;">
+                    <VBox spacing="10">
+                        <ImageView fx:id="galwayImage" fitHeight="150" fitWidth="150" />
+                        <Label text="Galway" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label text="Galway is a fantastic city for cyclists. There is an extensive bike path network that allows tourists and commuters alike to easily get around."
+                               wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #444;" />
+                    </VBox>
+                    <VBox spacing="10">
+                        <ImageView fx:id="limerickImage" fitHeight="150" fitWidth="150" />
+                        <Label text="Limerick" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label text="Limerick offers medieval and Georgian architecture, a newly renovated castle, a lively art museum and contemporary cafe culture, to go with its uncompromised pubs."
+                               wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #444;" />
+                    </VBox>
+                    <VBox spacing="10">
+                        <ImageView fx:id="corkImage" fitHeight="150" fitWidth="150" />
+                        <Label text="Cork" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label text="Ireland's second city, surrounded by interesting cycleways. Check out St. Patrick's Bridge on the North Channel of the Lee, through to the city's main shopping and commercial area."
+                               wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #444;" />
+                    </VBox>
+                    <VBox spacing="10">
+                        <ImageView fx:id="waterfordImage" fitHeight="150" fitWidth="150" />
+                        <Label text="Waterford" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                        <Label text="TFI Bikes are an ideal way to explore Ireland’s oldest city. Waterford is a perfect blend of ancient and modern so why not cycle through the historic streets and enjoy the local atmosphere of this vibrant city."
+                               wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #444;" />
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
+
+    <!-- Footer Section -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER" style="-fx-padding: 10; -fx-background-color: #2d572c;">
+            <Label text="Cork City Bikes © 2024 | All rights reserved."
+                   style="-fx-text-fill: white; -fx-font-size: 12px;" />
+        </HBox>
+    </bottom>
 </BorderPane>
